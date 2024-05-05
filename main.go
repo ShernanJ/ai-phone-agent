@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	twiml2 "github.com/flyandi/twiml"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/twilio/twilio-go/twiml"
@@ -61,15 +60,16 @@ func handleUserInput(c *gin.Context) {
 	// Process the user's input
 	responseMsg := "You said: " + userInput
 
-	// Generate a TwiML response
-	response := twiml2.NewResponse()
-
-	response.Add(
-		&twiml2.Say{
-			Text: responseMsg,
-		},
-	)
+	say := &twiml.VoiceSay{
+		Message: responseMsg,
+	}
 
 	// Send the TwiML response back to Twilio
-	c.XML(http.StatusOK, response)
+	twimlResult, err := twiml.Voice([]twiml.Element{say})
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	} else {
+		c.Header("Content-Type", "text/xml")
+		c.String(http.StatusOK, twimlResult)
+	}
 }

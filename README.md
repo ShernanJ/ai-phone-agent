@@ -5,6 +5,7 @@ This is an PoC app for a shower thought idea while thinking about the interview,
 ### Tools
 
 https://github.com/twilio/twilio-go
+https://github.com/cohere-ai/cohere-go
 
 https://github.com/gin-gonic/gin
 

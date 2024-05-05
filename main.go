@@ -1,12 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/twilio/twilio-go/twiml"
+
+	cohere "github.com/cohere-ai/cohere-go/v2"
+	cohereclient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
 func loadEnv() {
@@ -31,13 +36,13 @@ func main() {
 
 // Handles Twilio Webhook for incoming calls
 func incomingCallHandler(c *gin.Context) {
-	msg := "Welcome! This is a test call, say anything and I will say it back to you"
+	msg := "Welcome! This is a test call, Try to ask me questions and I will try to answer them. Example, ask me how the weather is like in your location."
 
 	gather := &twiml.VoiceGather{
-		Input:    "speech",
-		Language: "en-US",
-		Action:   "/handle-user-input",
-		Timeout:  "3",
+		Input:         "speech",
+		Language:      "en-US",
+		Action:        "/handle-user-input",
+		SpeechTimeout: "1",
 	}
 
 	say := &twiml.VoiceSay{
@@ -57,11 +62,16 @@ func incomingCallHandler(c *gin.Context) {
 func handleUserInput(c *gin.Context) {
 	userInput := c.PostForm("SpeechResult")
 
-	// Process the user's input
-	responseMsg := "You said: " + userInput
+	client := cohereclient.NewClient(cohereclient.WithToken(os.Getenv("COHERE_API_KEY")))
+	response, err := client.Chat(
+		context.TODO(),
+		&cohere.ChatRequest{
+			Message: userInput,
+		},
+	)
 
 	say := &twiml.VoiceSay{
-		Message: responseMsg,
+		Message: response.Text,
 	}
 
 	// Send the TwiML response back to Twilio

@@ -15,3 +15,9 @@ https://www.twilio.com/docs/voice/tutorials/how-to-respond-to-incoming-phone-cal
 https://www.twilio.com/docs/voice/make-calls
 https://www.twilio.com/docs/voice/quickstart/go
 https://www.twilio.com/docs/voice/twiml/gather
+
+### Cohere
+
+https://docs.cohere.com/docs/the-cohere-platform
+https://docs.cohere.com/reference/create-dataset
+https://docs.cohere.com/reference/createfinetunedmodel

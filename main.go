@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -26,12 +28,35 @@ func main() {
 	// Load Environment Variables
 	loadEnv()
 
-	router := gin.Default()
+	client := cohereclient.NewClient(cohereclient.WithToken(os.Getenv("COHERE_API_KEY")))
 
-	router.POST("/answer", incomingCallHandler)
-	router.POST("/handle-user-input", handleUserInput)
+	// Temporary Dataset
+	dataset, err := client.Datasets.Create(
+		context.TODO(),
+		&MyReader{Reader: strings.NewReader(""), name: "test.jsonl"},
+		&MyReader{Reader: strings.NewReader(""), name: "a.jsonl"},
+		&cohere.DatasetsCreateRequest{
+			Name: "prompt-completion-dataset",
+			Type: cohere.DatasetTypeEmbedResult,
+		},
+	)
 
-	router.Run(":8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("%+v", dataset)
+
+	datasetResult, err := client.Datasets.Get(context.TODO(), "prompt-completion-dataset")
+
+	log.Printf("Dataset: %v", datasetResult)
+
+	// router := gin.Default()
+
+	// router.POST("/answer", incomingCallHandler)
+	// router.POST("/handle-user-input", handleUserInput)
+
+	// router.Run(":8080")
 }
 
 // Handles Twilio Webhook for incoming calls
@@ -58,11 +83,42 @@ func incomingCallHandler(c *gin.Context) {
 	}
 }
 
+type MyReader struct {
+	io.Reader
+	name string
+}
+
+func (m *MyReader) Name() string {
+	return m.name
+}
+
 // Handles Twilio Webhook for user input
 func handleUserInput(c *gin.Context) {
 	userInput := c.PostForm("SpeechResult")
 
 	client := cohereclient.NewClient(cohereclient.WithToken(os.Getenv("COHERE_API_KEY")))
+
+	// Temporary Dataset
+	dataset, err := client.Datasets.Create(
+		context.TODO(),
+		&MyReader{Reader: strings.NewReader(""), name: "test.jsonl"},
+		&MyReader{Reader: strings.NewReader(""), name: "a.jsonl"},
+		&cohere.DatasetsCreateRequest{
+			Name: "prompt-completion-dataset",
+			Type: cohere.DatasetTypeEmbedResult,
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("%+v", dataset)
+
+	datasetResult, err := client.Datasets.Get(context.TODO(), "prompt-completion-dataset")
+
+	log.Printf("Dataset: %v", datasetResult)
+
 	response, err := client.Chat(
 		context.TODO(),
 		&cohere.ChatRequest{

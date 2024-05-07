@@ -75,8 +75,18 @@ func handleUserInput(c *gin.Context) {
 		Message: response.Text,
 	}
 
-	// Send the TwiML response back to Twilio
-	twimlResult, err := twiml.Voice([]twiml.Element{say})
+	gather := &twiml.VoiceGather{
+		Input:         "speech",
+		Language:      "en-US",
+		Action:        "/handle-user-input",
+		SpeechTimeout: "1",
+	}
+
+	askMore := &twiml.VoiceSay{
+		Message: "Do you have any more questions?",
+	}
+
+	twimlResult, err := twiml.Voice([]twiml.Element{say, askMore, gather})
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 	} else {

@@ -31,7 +31,7 @@ func main() {
 	router.POST("/answer", incomingCallHandler)
 	router.POST("/handle-user-input", handleUserInput)
 
-	router.Run(":8080")
+	router.Run(":10000")
 }
 
 // Handles Twilio Webhook for incoming calls

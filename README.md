@@ -1,6 +1,6 @@
 # Mockcim AI Support
 
-This is an PoC app for a shower thought idea while thinking about the interview, to potentially tackle one of the reoccuring negative customer feedback from a certain company (we shall name the company Mockcim for now)
+This is an PoC app for a shower thought idea while thinking about the interview, to potentially tackle a reoccuring customer feedback from a certain company (we shall name the company Mockcim for now)
 
 ### Tools
 
